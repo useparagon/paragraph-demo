@@ -1,16 +1,16 @@
-import { EventStep, Workflow } from '@useparagon/core';
+import { EventStep, FunctionStep, UnselectedStep, Workflow } from '@useparagon/core';
 import { IContext } from '@useparagon/core/execution';
 import { IPersona } from '@useparagon/core/persona';
 import { ConditionalInput } from '@useparagon/core/steps/library/conditional';
 import { IConnectUser, IPermissionContext } from '@useparagon/core/user';
 import {
-  ISalesforceIntegration,
+  IClickupIntegration,
   InputResultMap,
   createInputs,
-} from '@useparagon/types/salesforce';
+} from '@useparagon/types/clickup';
 
-import event from '../../../events/newTask';
 import personaMeta from '../../../persona.meta';
+import event from '../../../events/newTask';
 
 /**
  * define inputs here which can be used in this workflow only
@@ -18,22 +18,22 @@ import personaMeta from '../../../persona.meta';
 const inputs = createInputs({});
 
 /**
- * Sync records from Salesforce Workflow implementation
+ * Sync tasks to ClickUp Workflow implementation
  */
 export default class extends Workflow<
-  ISalesforceIntegration,
+  IClickupIntegration,
   IPersona<typeof personaMeta>,
   InputResultMap
 > {
   /**
    * This property is maintained by Paragon. Do not edit this property.
    */
-  readonly id: string = 'd82119e3-ede9-4aa5-8883-a8ae0b84645d';
+  readonly id: string = 'e3cfa842-fd7c-4067-ac21-ed1e5f950c04';
 
   /**
    * name shown in workflow editor
    */
-  name: string = 'Sync records from Salesforce';
+  name: string = 'Sync tasks to ClickUp';
 
   /**
    * description shown in connect portal for workflow
@@ -63,7 +63,7 @@ export default class extends Workflow<
    * @param user
    */
   define(
-    integration: ISalesforceIntegration,
+    integration: IClickupIntegration,
     context: IContext<InputResultMap>,
     connectUser: IConnectUser<IPersona<typeof personaMeta>>,
   ) {
@@ -73,26 +73,24 @@ export default class extends Workflow<
 
     const triggerStep = new EventStep(event);
 
-    const descriptionStep = integration.withIntent(
-      integration.intents.SALESFORCE_CREATE_RECORD,
-      {
-        recordType: 'Task',
-        'field-Name': context.getOutput(triggerStep),
-        'field-taskSubtype': 'task',
-        'field-subject': context.getOutput(triggerStep).title,
+    const functionstepStep = new FunctionStep({
+      code: function yourFunction(parameters, libraries) {
+        return 'hello world';
       },
-    );
+      parameters: {},
+      description: 'Function Step',
+    });
 
     /**
      * chain steps correctly here
      */
 
-    triggerStep.nextStep(descriptionStep);
+    triggerStep.nextStep(functionstepStep);
 
     /**
      * pass all steps here so that paragon can keep track of changes
      */
-    return this.register({ triggerStep, descriptionStep });
+    return this.register({ triggerStep, functionstepStep });
   }
 
   /**
