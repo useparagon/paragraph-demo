@@ -30,11 +30,11 @@ jobs:
         with:
           # Version Spec of the version to use. Examples: 12.x, 10.15.1, >=10.15.0.
           node-version: 20.x
-          # Used to pull node distributions from node-versions. Since there's a default, this is typically not supplied by the user. When running this action on github.com, the default value is sufficient. When running on GHES, you can pass a personal access token for github.com if you are experiencing rate limiting.
-          token: ${{ secrets.NPM_TOKEN }}
 
       - name: Install para CLI
-        run: npm install -g @useparagon/cli@next
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          npm install -g @useparagon/cli@next
 
       - name: Authenticate into CLI
         env:
