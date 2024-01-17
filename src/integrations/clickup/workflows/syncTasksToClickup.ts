@@ -10,7 +10,7 @@ import {
 } from '@useparagon/types/clickup';
 
 import personaMeta from '../../../persona.meta';
-import event from 'src/events/newTask';
+import event from '../../../events/newTask';
 
 /**
  * define inputs here which can be used in this workflow only
