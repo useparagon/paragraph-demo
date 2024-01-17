@@ -62,5 +62,8 @@ jobs:
           }
           EOF
 
+      - name: Build Paragraph project
+        run: para build
+
       - name: Push to Paragon
         run: para push
