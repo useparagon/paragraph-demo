@@ -64,7 +64,7 @@ jobs:
 
       - name: Build Paragraph project
         run: |
-          npm install
+          para install
           para build
 
       - name: Push to Paragon
