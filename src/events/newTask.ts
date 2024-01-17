@@ -1,12 +1,8 @@
 import { IEventInit } from '@useparagon/core/event';
 
 export type EventSchema = {
-  a: true;
-  b: 1;
-  c: false;
-  d: 'f';
-  e: 2;
-  f: 'asdf';
+  title: 'Test';
+  priority: 'P2';
 };
 
 const event: IEventInit<EventSchema> = {
@@ -19,12 +15,8 @@ const event: IEventInit<EventSchema> = {
    * schema of event payload
    */
   schema: {
-    a: true,
-    b: 1,
-    c: false,
-    d: 'f',
-    e: 2,
-    f: 'asdf',
+    title: 'Test',
+    priority: 'P2',
   },
 };
 

@@ -9,7 +9,7 @@
     "build": "para build"
   },
   "dependencies": {
-    "@useparagon/core": "0.0.1-canary.21",
+    "@useparagon/core": "0.0.1-canary.24",
     "tslib": "2.3.1"
   },
   "devDependencies": {

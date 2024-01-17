@@ -1,4 +1,4 @@
-import { UnselectedStep, Workflow } from '@useparagon/core';
+import { EventStep, Workflow } from '@useparagon/core';
 import { IContext } from '@useparagon/core/execution';
 import { IPersona } from '@useparagon/core/persona';
 import { ConditionalInput } from '@useparagon/core/steps/library/conditional';
@@ -9,6 +9,7 @@ import {
   createInputs,
 } from '@useparagon/types/salesforce';
 
+import event from '../../../events/newTask';
 import personaMeta from '../../../persona.meta';
 
 /**
@@ -70,18 +71,28 @@ export default class extends Workflow<
      * declare all steps here
      */
 
-    const triggerStep = new UnselectedStep();
+    const triggerStep = new EventStep(event);
+
+    const createtaskStep = integration.withIntent(
+      integration.intents.SALESFORCE_CREATE_RECORD,
+      {
+        recordType: 'Task',
+        'field-Name': context.getOutput(triggerStep),
+        'field-taskSubtype': 'task',
+        'field-subject': context.getOutput(triggerStep).title,
+      },
+    );
 
     /**
      * chain steps correctly here
      */
 
-    triggerStep;
+    triggerStep.nextStep(createtaskStep);
 
     /**
      * pass all steps here so that paragon can keep track of changes
      */
-    return this.register({ triggerStep });
+    return this.register({ triggerStep, createtaskStep });
   }
 
   /**
