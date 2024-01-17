@@ -42,25 +42,25 @@ jobs:
         run: |
           mkdir -p ~/.paragon
           cat << EOF > ~/.paragon/credentials.json
-            {
-              "default": {
-                "profile": "default",
-                "token": "$PARAGON_CLI_KEY"
-              }
+          {
+            "default": {
+              "profile": "default",
+              "token": "$PARAGON_CLI_KEY"
             }
-            EOF
+          }
+          EOF
           cat << EOF > ~/.paragon/profiles.json
-            {
-              "default": {
-                "name": "default",
-                "default": true,
-                "services": {
-                  "zeus": "https://siete-zeus.paragonsandbox.com",
-                  "dashboard": "https://siete.paragonsandbox.com"
-                }
+          {
+            "default": {
+              "name": "default",
+              "default": true,
+              "services": {
+                "zeus": "https://siete-zeus.paragonsandbox.com",
+                "dashboard": "https://siete.paragonsandbox.com"
               }
             }
-            EOF
+          }
+          EOF
 
       - name: Push to Paragon
         run: para push
