@@ -68,4 +68,5 @@ jobs:
           para build
 
       - name: Push to Paragon
+        if: github.event_name == 'push'
         run: para push
