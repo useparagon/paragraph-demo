@@ -63,7 +63,9 @@ jobs:
           EOF
 
       - name: Build Paragraph project
-        run: para build
+        run: |
+          npm install
+          para build
 
       - name: Push to Paragon
         run: para push
