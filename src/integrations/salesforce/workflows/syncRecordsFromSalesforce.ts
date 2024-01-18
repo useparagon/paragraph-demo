@@ -74,7 +74,7 @@ export default class extends Workflow<
 
     const triggerStep = new EventStep(event);
 
-    const actionStep = integration.withIntent(
+    const descriptionStep = integration.withIntent(
       integration.intents.SALESFORCE_SEARCH_RECORDS,
       {
         recordType: 'Task',
@@ -86,16 +86,16 @@ export default class extends Workflow<
     );
 
     const doesexistStep = new ConditionalStep({
-      if: Operators.ArrayIsNotEmpty(context.getOutput(actionStep).result),
+      if: Operators.ArrayIsNotEmpty(context.getOutput(descriptionStep).result),
       description: 'Does exist?',
     });
 
-    const updaterecordStep = integration.withIntent(
+    const descriptionStep1 = integration.withIntent(
       integration.intents.SALESFORCE_UPDATE_RECORD,
-      { recordType: 'Task', recordId: `` },
+      { recordType: 'Task', recordId: '' },
     );
 
-    const createrecordStep = integration.withIntent(
+    const descriptionStep2 = integration.withIntent(
       integration.intents.SALESFORCE_CREATE_RECORD,
       {
         recordType: 'Task',
@@ -110,9 +110,9 @@ export default class extends Workflow<
      */
 
     triggerStep
-      .nextStep(actionStep)
+      .nextStep(descriptionStep)
       .nextStep(
-        doesexistStep.whenTrue(updaterecordStep).whenFalse(createrecordStep),
+        doesexistStep.whenTrue(descriptionStep1).whenFalse(descriptionStep2),
       );
 
     /**
@@ -120,10 +120,10 @@ export default class extends Workflow<
      */
     return this.register({
       triggerStep,
-      actionStep,
+      descriptionStep,
       doesexistStep,
-      updaterecordStep,
-      createrecordStep,
+      descriptionStep1,
+      descriptionStep2,
     });
   }
 

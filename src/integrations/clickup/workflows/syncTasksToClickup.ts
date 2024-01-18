@@ -1,4 +1,4 @@
-import { EventStep, FunctionStep, UnselectedStep, Workflow } from '@useparagon/core';
+import { EventStep, FunctionStep, Workflow } from '@useparagon/core';
 import { IContext } from '@useparagon/core/execution';
 import { IPersona } from '@useparagon/core/persona';
 import { ConditionalInput } from '@useparagon/core/steps/library/conditional';
@@ -9,8 +9,8 @@ import {
   createInputs,
 } from '@useparagon/types/clickup';
 
-import personaMeta from '../../../persona.meta';
 import event from '../../../events/newTask';
+import personaMeta from '../../../persona.meta';
 
 /**
  * define inputs here which can be used in this workflow only
