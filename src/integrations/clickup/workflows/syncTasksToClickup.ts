@@ -1,14 +1,13 @@
-import { ConditionalStep, EventStep, Workflow } from '@useparagon/core';
+import { EventStep, FunctionStep, Workflow } from '@useparagon/core';
 import { IContext } from '@useparagon/core/execution';
-import * as Operators from '@useparagon/core/operator';
 import { IPersona } from '@useparagon/core/persona';
 import { ConditionalInput } from '@useparagon/core/steps/library/conditional';
 import { IConnectUser, IPermissionContext } from '@useparagon/core/user';
 import {
-  ISalesforceIntegration,
+  IClickupIntegration,
   InputResultMap,
   createInputs,
-} from '@useparagon/types/salesforce';
+} from '@useparagon/types/clickup';
 
 import event from '../../../events/newTask';
 import personaMeta from '../../../persona.meta';
@@ -19,22 +18,22 @@ import personaMeta from '../../../persona.meta';
 const inputs = createInputs({});
 
 /**
- * Sync records from Salesforce Workflow implementation
+ * Sync tasks to ClickUp Workflow implementation
  */
 export default class extends Workflow<
-  ISalesforceIntegration,
+  IClickupIntegration,
   IPersona<typeof personaMeta>,
   InputResultMap
 > {
   /**
    * This property is maintained by Paragon. Do not edit this property.
    */
-  readonly id: string = 'd82119e3-ede9-4aa5-8883-a8ae0b84645d';
+  readonly id: string = 'e3cfa842-fd7c-4067-ac21-ed1e5f950c04';
 
   /**
    * name shown in workflow editor
    */
-  name: string = 'Sync records from Salesforce';
+  name: string = 'Sync tasks to ClickUp';
 
   /**
    * description shown in connect portal for workflow
@@ -64,7 +63,7 @@ export default class extends Workflow<
    * @param user
    */
   define(
-    integration: ISalesforceIntegration,
+    integration: IClickupIntegration,
     context: IContext<InputResultMap>,
     connectUser: IConnectUser<IPersona<typeof personaMeta>>,
   ) {
@@ -74,57 +73,24 @@ export default class extends Workflow<
 
     const triggerStep = new EventStep(event);
 
-    const actionStep = integration.withIntent(
-      integration.intents.SALESFORCE_SEARCH_RECORDS,
-      {
-        recordType: 'Task',
-        filterFormula: Operators.StringContains(
-          'subject',
-          context.getOutput(triggerStep),
-        ),
+    const functionstepStep = new FunctionStep({
+      code: function yourFunction(parameters, libraries) {
+        return 'hello world';
       },
-    );
-
-    const doesexistStep = new ConditionalStep({
-      if: undefined,
-      description: 'Does exist?',
+      parameters: {},
+      description: 'Function Step',
     });
-
-    const updaterecordStep = integration.withIntent(
-      integration.intents.SALESFORCE_UPDATE_RECORD,
-      { recordType: 'Task', recordId: `` },
-    );
-
-    const createrecordStep = integration.withIntent(
-      integration.intents.SALESFORCE_CREATE_RECORD,
-      {
-        recordType: 'Task',
-        'field-Name': context.getOutput(triggerStep),
-        'field-taskSubtype': 'task',
-        'field-subject': context.getOutput(triggerStep).title,
-      },
-    );
 
     /**
      * chain steps correctly here
      */
 
-    triggerStep
-      .nextStep(actionStep)
-      .nextStep(
-        doesexistStep.whenTrue(updaterecordStep).whenFalse(createrecordStep),
-      );
+    triggerStep.nextStep(functionstepStep);
 
     /**
      * pass all steps here so that paragon can keep track of changes
      */
-    return this.register({
-      triggerStep,
-      actionStep,
-      doesexistStep,
-      updaterecordStep,
-      createrecordStep,
-    });
+    return this.register({ triggerStep, functionstepStep });
   }
 
   /**
