@@ -80,13 +80,13 @@ export default class extends Workflow<
         recordType: 'Task',
         filterFormula: Operators.StringContains(
           'subject',
-          context.getOutput(triggerStep),
+          context.getOutput(triggerStep).title,
         ),
       },
     );
 
     const doesexistStep = new ConditionalStep({
-      if: undefined,
+      if: Operators.ArrayIsNotEmpty(context.getOutput(actionStep).result),
       description: 'Does exist?',
     });
 
