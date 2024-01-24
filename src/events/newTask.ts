@@ -1,6 +1,7 @@
 import { IEventInit } from '@useparagon/core/event';
 
 export type EventSchema = {
+  title: "Example Title",
   a: true;
   b: 1;
   c: false;
@@ -19,6 +20,7 @@ const event: IEventInit<EventSchema> = {
    * schema of event payload
    */
   schema: {
+    title: "Example Title",
     a: true,
     b: 1,
     c: false,
