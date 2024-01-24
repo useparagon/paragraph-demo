@@ -1,6 +1,5 @@
-import { ConditionalStep, EventStep, Workflow } from '@useparagon/core';
+import { UnselectedStep, Workflow } from '@useparagon/core';
 import { IContext } from '@useparagon/core/execution';
-import * as Operators from '@useparagon/core/operator';
 import { IPersona } from '@useparagon/core/persona';
 import { ConditionalInput } from '@useparagon/core/steps/library/conditional';
 import { IConnectUser, IPermissionContext } from '@useparagon/core/user';
@@ -10,7 +9,6 @@ import {
   createInputs,
 } from '@useparagon/types/salesforce';
 
-import event from '../../../events/newTask';
 import personaMeta from '../../../persona.meta';
 
 /**
@@ -72,59 +70,18 @@ export default class extends Workflow<
      * declare all steps here
      */
 
-    const triggerStep = new EventStep(event);
-
-    const descriptionStep = integration.withIntent(
-      integration.intents.SALESFORCE_SEARCH_RECORDS,
-      {
-        recordType: 'Task',
-        filterFormula: Operators.StringContains(
-          'subject',
-          context.getOutput(triggerStep).title,
-        ),
-      },
-    );
-
-    const doesexistStep = new ConditionalStep({
-      if: Operators.ArrayIsNotEmpty(context.getOutput(descriptionStep).result),
-      description: 'Does exist?',
-    });
-
-    const descriptionStep1 = integration.withIntent(
-      integration.intents.SALESFORCE_UPDATE_RECORD,
-      { recordType: 'Task', recordId: '' },
-    );
-
-    const descriptionStep2 = integration.withIntent(
-      integration.intents.SALESFORCE_CREATE_RECORD,
-      {
-        recordType: 'Task',
-        'field-Name': context.getOutput(triggerStep),
-        'field-taskSubtype': 'task',
-        'field-subject': context.getOutput(triggerStep).title,
-      },
-    );
+    const triggerStep = new UnselectedStep();
 
     /**
      * chain steps correctly here
      */
 
-    triggerStep
-      .nextStep(descriptionStep)
-      .nextStep(
-        doesexistStep.whenTrue(descriptionStep1).whenFalse(descriptionStep2),
-      );
+    triggerStep;
 
     /**
      * pass all steps here so that paragon can keep track of changes
      */
-    return this.register({
-      triggerStep,
-      descriptionStep,
-      doesexistStep,
-      descriptionStep1,
-      descriptionStep2,
-    });
+    return this.register({ triggerStep });
   }
 
   /**
