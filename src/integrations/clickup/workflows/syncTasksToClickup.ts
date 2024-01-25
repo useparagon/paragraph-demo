@@ -11,6 +11,7 @@ import {
 
 import event from '../../../events/newTask';
 import personaMeta from '../../../persona.meta';
+import sharedInputs from '../inputs';
 
 /**
  * define inputs here which can be used in this workflow only
@@ -73,24 +74,33 @@ export default class extends Workflow<
 
     const triggerStep = new EventStep(event);
 
-    const functionstepStep = new FunctionStep({
-      code: function yourFunction(parameters, libraries) {
-        return 'hello world';
+    const functionStep = new FunctionStep({
+      code: function appendTaskLabPrefix(parameters, libraries) {
+        return '[TaskLab] ' + parameters.description;
       },
-      parameters: {},
-      description: 'Function Step',
+      parameters: { description: triggerStep.output },
+      description: 'Create Description',
     });
+
+    const createtaskStep = integration.withIntent(
+      integration.intents.CLICKUP_CREATE_TASK,
+      {
+        listId: context.getInput(sharedInputs.list).list,
+        name: triggerStep.output.title,
+        description: functionStep.output.result,
+      },
+    );
 
     /**
      * chain steps correctly here
      */
 
-    triggerStep.nextStep(functionstepStep);
+    triggerStep.nextStep(functionStep).nextStep(createtaskStep);
 
     /**
      * pass all steps here so that paragon can keep track of changes
      */
-    return this.register({ triggerStep, functionstepStep });
+    return this.register({ triggerStep, functionStep, createtaskStep });
   }
 
   /**
