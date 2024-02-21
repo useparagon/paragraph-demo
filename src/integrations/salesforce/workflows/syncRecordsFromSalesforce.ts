@@ -12,7 +12,7 @@ import {
 import personaMeta from '../../../persona.meta';
 
 /**
- * define inputs here which can be used in this workflow only
+ * Use `inputs` to define Workflow Settings.
  */
 const inputs = createInputs({});
 
@@ -29,47 +29,22 @@ export default class extends Workflow<
    */
   readonly id: string = 'd82119e3-ede9-4aa5-8883-a8ae0b84645d';
 
-  /**
-   * name shown in workflow editor
-   */
-  name: string = 'Sync records from Salesforce';
 
-  /**
-   * description shown in connect portal for workflow
-   */
+  name: string = 'Sync records from Salesforce';
   description: string = 'Add a user-facing description of this workflow';
 
-  /**
-   * inputs used in workflows
-   */
   inputs = inputs;
-
-  /**
-   * if set to true , workflow will be automatically be enabled
-   * after integration connect
-   */
   defaultEnabled: boolean = false;
-
-  /**
-   * if true , workflow will be hidden from connect portal
-   */
   hidden: boolean = false;
 
   /**
-   * defines the workflow
-   * @param integration
-   * @param context
-   * @param user
+   * Define workflow steps and orchestration.
    */
   define(
     integration: ISalesforceIntegration,
     context: IContext<InputResultMap>,
     connectUser: IConnectUser<IPersona<typeof personaMeta>>,
   ) {
-    /**
-     * declare all steps here
-     */
-
     const triggerStep = integration.withTrigger(
       integration.triggers.SALESFORCE_TRIGGER_RECORD_CREATED,
       {
@@ -81,25 +56,19 @@ export default class extends Workflow<
       method: "POST",
       url: `https://api.myapp.io/api/contacts`,
       authorization: {
-        // @ts-expect-error
         type: "bearer",
         token: context.getEnvironmentSecret("API_SECRET")
       },
+      bodyType: "json",
       body: {
         user_id: connectUser.userId,
         contact: triggerStep.output.result
       },
       description: "Send to my API"
     });
-    /**
-     * chain steps correctly here
-     */
 
     triggerStep.nextStep(sendToMyAPI);
 
-    /**
-     * pass all steps here so that paragon can keep track of changes
-     */
     return this.register({ triggerStep, sendToMyAPI });
   }
 
