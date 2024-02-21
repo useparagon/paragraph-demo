@@ -1,4 +1,4 @@
-import { UnselectedStep, Workflow } from '@useparagon/core';
+import { RequestStep, Workflow } from '@useparagon/core';
 import { IContext } from '@useparagon/core/execution';
 import { IPersona } from '@useparagon/core/persona';
 import { ConditionalInput } from '@useparagon/core/steps/library/conditional';
@@ -70,18 +70,36 @@ export default class extends Workflow<
      * declare all steps here
      */
 
-    const triggerStep = new UnselectedStep();
+    const triggerStep = integration.withTrigger(
+      integration.triggers.SALESFORCE_TRIGGER_RECORD_CREATED,
+      {
+        recordType: "Contact"
+      },
+    );
 
+    const sendToMyAPI = new RequestStep({
+      method: "POST",
+      url: `https://api.myapp.io/api/contacts`,
+      authorization: {
+        type: "bearer",
+        token: context.getEnvironmentSecret("API_SECRET")
+      },
+      body: {
+        user_id: connectUser.userId,
+        contact: triggerStep.output.result
+      },
+      description: "Send to my API"
+    });
     /**
      * chain steps correctly here
      */
 
-    triggerStep;
+    triggerStep.nextStep(sendToMyAPI);
 
     /**
      * pass all steps here so that paragon can keep track of changes
      */
-    return this.register({ triggerStep });
+    return this.register({ triggerStep, sendToMyAPI });
   }
 
   /**
