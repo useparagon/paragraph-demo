@@ -81,6 +81,7 @@ export default class extends Workflow<
       method: "POST",
       url: `https://api.myapp.io/api/contacts`,
       authorization: {
+        // @ts-expect-error
         type: "bearer",
         token: context.getEnvironmentSecret("API_SECRET")
       },
