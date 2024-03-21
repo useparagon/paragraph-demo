@@ -85,7 +85,7 @@ export default class extends Workflow<
    * Connect Portal.
    * https://docs.useparagon.com/connect-portal/displaying-workflows#hide-workflow-from-portal-for-all-users
    */
-  hidden: boolean = true;
+  hidden: boolean = false;
 
   /**
    * You can restrict the visibility of this workflow to specific users
