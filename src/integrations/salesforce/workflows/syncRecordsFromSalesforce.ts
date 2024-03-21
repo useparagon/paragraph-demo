@@ -12,11 +12,6 @@ import {
 import personaMeta from '../../../persona.meta';
 
 /**
- * Use `inputs` to define Workflow Settings.
- */
-const inputs = createInputs({});
-
-/**
  * Sync records from Salesforce Workflow implementation
  */
 export default class extends Workflow<
@@ -25,19 +20,6 @@ export default class extends Workflow<
   InputResultMap
 > {
   /**
-   * This property is maintained by Paragon. Do not edit this property.
-   */
-  readonly id: string = 'd82119e3-ede9-4aa5-8883-a8ae0b84645d';
-
-
-  name: string = 'Sync records from Salesforce';
-  description: string = 'Add a user-facing description of this workflow';
-
-  inputs = inputs;
-  defaultEnabled: boolean = false;
-  hidden: boolean = false;
-
-  /**
    * Define workflow steps and orchestration.
    */
   define(
@@ -45,40 +27,79 @@ export default class extends Workflow<
     context: IContext<InputResultMap>,
     connectUser: IConnectUser<IPersona<typeof personaMeta>>,
   ) {
-    const triggerStep = integration.withTrigger(
-      integration.triggers.SALESFORCE_TRIGGER_RECORD_CREATED,
-      {
-        recordType: "Contact"
-      },
-    );
-
-    const sendToMyAPI = new RequestStep({
-      method: "POST",
-      url: `https://api.myapp.io/api/contacts`,
-      authorization: {
-        type: "bearer",
-        token: context.getEnvironmentSecret("API_SECRET")
-      },
-      bodyType: "json",
-      body: {
-        user_id: connectUser.userId,
-        contact: triggerStep.output.result
-      },
-      description: "Send to my API"
+    const triggerStep = integration.triggers.recordCreated({
+      recordType: 'Contact',
     });
 
-    triggerStep.nextStep(sendToMyAPI);
+    const sendtomyapiStep = new RequestStep({
+      autoRetry: false,
+      continueWorkflowOnError: false,
+      description: 'Send to my API',
+      url: `https://api.myapp.io/api/contacts`,
+      method: 'POST',
+      params: {},
+      headers: {},
+      authorization: {
+        type: 'bearer',
+        token: `${context.getEnvironmentSecret('API_SECRET')}`,
+      },
+      body: { user_id: connectUser.userId, contact: triggerStep.output.result },
+      bodyType: 'json',
+    });
 
-    return this.register({ triggerStep, sendToMyAPI });
+    triggerStep.nextStep(sendtomyapiStep);
+
+    /**
+     * Pass all steps used in the workflow to the `.register()`
+     * function. The keys used in this function must remain stable.
+     */
+    return this.register({ triggerStep, sendtomyapiStep });
   }
 
   /**
-   * define permissions for workflow
-   * @param context
+   * The name of the workflow, used in the Dashboard and Connect Portal.
+   */
+  name: string = 'Sync records from Salesforce';
+
+  /**
+   * A user-facing description of the workflow shown in the Connect Portal.
+   */
+  description: string = 'Add a user-facing description of this workflow';
+
+  /**
+   * Define workflow-level User Settings. For integration-level User
+   * Settings, see ../config.ts.
+   * https://docs.useparagon.com/connect-portal/workflow-user-settings
+   */
+  inputs = createInputs({});
+
+  /**
+   * If set to true, the workflow will appear as enabled by default once
+   * a user connects their account to the integration.
+   * https://docs.useparagon.com/connect-portal/displaying-workflows#default-to-enabled
+   */
+  defaultEnabled: boolean = false;
+
+  /**
+   * If set to true, the workflow will be hidden from all users from the
+   * Connect Portal.
+   * https://docs.useparagon.com/connect-portal/displaying-workflows#hide-workflow-from-portal-for-all-users
+   */
+  hidden: boolean = true;
+
+  /**
+   * You can restrict the visibility of this workflow to specific users
+   * with Workflow Permissions.
+   * https://docs.useparagon.com/connect-portal/workflow-permissions
    */
   definePermissions(
     connectUser: IPermissionContext<IPersona<typeof personaMeta>>,
   ): ConditionalInput | undefined {
     return undefined;
   }
+
+  /**
+   * This property is maintained by Paragon. Do not edit this property.
+   */
+  readonly id: string = 'd82119e3-ede9-4aa5-8883-a8ae0b84645d';
 }
