@@ -55,8 +55,8 @@ jobs:
               "name": "default",
               "default": true,
               "services": {
-                "zeus": "https://staging-zeus.paragonsandbox.com",
-                "dashboard": "https://staging.paragonsandbox.com"
+                "zeus": "https://seis-zeus.paragonsandbox.com",
+                "dashboard": "https://seis.paragonsandbox.com"
               }
             }
           }
