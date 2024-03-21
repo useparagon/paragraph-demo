@@ -35,7 +35,7 @@ export default class extends Workflow<
   ) {
     const triggerStep = new EventStep(newTask);
 
-    const createInSalesforce;
+    let createInSalesforce;
 
     triggerStep.nextStep(createInSalesforce);
 
