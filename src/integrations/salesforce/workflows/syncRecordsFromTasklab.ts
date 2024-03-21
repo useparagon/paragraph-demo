@@ -1,4 +1,9 @@
-import { FunctionStep, UnselectedStep, Workflow } from '@useparagon/core';
+import {
+  EventStep,
+  FunctionStep,
+  UnselectedStep,
+  Workflow,
+} from '@useparagon/core';
 import { IContext } from '@useparagon/core/execution';
 import { IPersona } from '@useparagon/core/persona';
 import { ConditionalInput } from '@useparagon/core/steps/library/conditional';
@@ -9,6 +14,7 @@ import {
   createInputs,
 } from '@useparagon/types/salesforce';
 
+import newTask from '../../../events/newTask';
 import personaMeta from '../../../persona.meta';
 
 /**
@@ -27,24 +33,17 @@ export default class extends Workflow<
     context: IContext<InputResultMap>,
     connectUser: IConnectUser<IPersona<typeof personaMeta>>,
   ) {
-    const triggerStep = new UnselectedStep();
+    const triggerStep = new EventStep(newTask);
 
-    const functionstepStep = new FunctionStep({
-      autoRetry: false,
-      description: 'Function Step',
-      code: function yourFunction(parameters, libraries) {
-        return 'hello world';
-      },
-      parameters: {},
-    });
+    const createInSalesforce;
 
-    triggerStep.nextStep(functionstepStep);
+    triggerStep.nextStep(createInSalesforce);
 
     /**
      * Pass all steps used in the workflow to the `.register()`
      * function. The keys used in this function must remain stable.
      */
-    return this.register({ triggerStep, functionstepStep });
+    return this.register({ triggerStep, createInSalesforce });
   }
 
   /**
