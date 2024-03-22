@@ -90,8 +90,8 @@ export default class extends Workflow<
       .nextStep(searchByEmailStep)
       .nextStep(
         contactExistsCondition
-          .whenTrue(createContactStep)
-          .whenFalse(updateContactStep),
+          .whenTrue(updateContactStep)
+          .whenFalse(createContactStep),
       );
 
     /**
