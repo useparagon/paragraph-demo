@@ -1,4 +1,4 @@
-import { createInputs } from '@useparagon/types/hubspot';
+import { createInputs } from '@useparagon/integrations/hubspot';
 
 /**
  * define inputs here which can be used across workflows

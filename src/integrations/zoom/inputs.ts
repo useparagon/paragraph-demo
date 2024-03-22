@@ -1,4 +1,4 @@
-import { createInputs } from '@useparagon/types/zoom';
+import { createInputs } from '@useparagon/integrations/zoom';
 
 /**
  * define inputs here which can be used across workflows

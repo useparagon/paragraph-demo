@@ -1,4 +1,4 @@
-import { createInputs } from '@useparagon/types/slack';
+import { createInputs } from '@useparagon/integrations/slack';
 
 /**
  * define inputs here which can be used across workflows
