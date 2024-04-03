@@ -1,12 +1,12 @@
-import { createInputs } from '@useparagon/integrations/slack';
+import { createInputs } from '@useparagon/integrations/microsoftTeams';
 
 /**
  * define inputs here which can be used across workflows
  */
 const integrationInputs = createInputs({
-    "channel": {
+    channel: {
         id: "channel",
-        title: "Select a Slack Channel",
+        title: "Select a Microsoft Teams channel",
         type: "channel",
         required: true
     }

@@ -17,9 +17,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: push
-        uses: useparagon/paragraph-push@70c7762c33b63705dd070c0597b0986aafc8be0c
+        uses: useparagon/paragraph-push@v1
         with:
           paragonKey: ${{ secrets.PARAGON_CLI_KEY }}
-          npmToken: ${{ secrets.NPM_TOKEN }}
-          paragonZeusUrl: https://seis-zeus.paragonsandbox.com
-          paragonDashboardUrl: https://seis.paragonsandbox.com
+          paragonZeusUrl: https://zeus.useparagon.com
+          paragonDashboardUrl: https://dashboard.useparagon.com
