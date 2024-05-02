@@ -91,5 +91,5 @@ export default class extends Workflow<
   /**
    * This property is maintained by Paragon. Do not edit this property.
    */
-  readonly id: string = '56e6dffa-cce8-44d3-a7b1-781028900a74';
+  readonly id: string = 'b001e3c8-f499-4673-85fd-e6230cb9cebd';
 }
