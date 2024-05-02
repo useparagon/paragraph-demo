@@ -21,5 +21,5 @@ jobs:
         with:
           paragonKey: ${{ secrets.PARAGON_CLI_KEY }}
           npmToken: ${{ secrets.NPM_TOKEN }}
-          paragonZeusUrl: https://seis-zeus.paragonsandbox.com
-          paragonDashboardUrl: https://seis.paragonsandbox.com
+          paragonZeusUrl: https://zeus.useparagon.com
+          paragonDashboardUrl: https://dashboard.useparagon.com
