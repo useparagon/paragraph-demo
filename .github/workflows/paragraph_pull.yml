@@ -24,11 +24,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: pull
-        uses: useparagon/paragraph-pull@cd3b536fdb187678d6a4971202644ffbd0e1b10c
+        uses: useparagon/paragraph-pull@v1
         with:
           projectId: ${{ inputs.projectId }}
           commitId: ${{ inputs.commitId }}
           paragonKey: ${{ secrets.PARAGON_CLI_KEY }}
-          npmToken: ${{ secrets.NPM_TOKEN }}
-          paragonZeusUrl: https://seis-zeus.paragonsandbox.com
-          paragonDashboardUrl: https://seis.paragonsandbox.com
+          paragonZeusUrl: https://zeus.useparagon.com
+          paragonDashboardUrl: https://dashboard.useparagon.com

@@ -1,4 +1,8 @@
-import { ConditionalStep, RequestStep, Workflow } from '@useparagon/core';
+import {
+  ConditionalStep,
+  RequestStep,
+  Workflow,
+} from '@useparagon/core';
 import { IContext } from '@useparagon/core/execution';
 import * as Operators from '@useparagon/core/operator';
 import { IPersona } from '@useparagon/core/persona';
