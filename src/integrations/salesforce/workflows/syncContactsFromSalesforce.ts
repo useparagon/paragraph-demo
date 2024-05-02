@@ -1,4 +1,9 @@
-import { ConditionalStep, RequestStep, Workflow } from '@useparagon/core';
+import {
+  ConditionalStep,
+  IntegrationRequestStep,
+  RequestStep,
+  Workflow,
+} from '@useparagon/core';
 import { IContext } from '@useparagon/core/execution';
 import * as Operators from '@useparagon/core/operator';
 import { IPersona } from '@useparagon/core/persona';
@@ -11,6 +16,7 @@ import {
 } from '@useparagon/integrations/salesforce';
 
 import personaMeta from '../../../persona.meta';
+import sharedInputs from '../inputs';
 
 /**
  * Sync contacts from Salesforce Workflow implementation
@@ -31,42 +37,27 @@ export default class extends Workflow<
     const triggerStep = integration.triggers.recordCreated({
       recordType: 'Contact',
       recordsFilterFormula: undefined,
+      objectMapping: `${context.getInput(sharedInputs.field_mapping).record_type}`,
     });
 
-    const searchByEmailStep = new RequestStep({
+    const requestStep = new RequestStep({
+      autoRetry: false,
+      continueWorkflowOnError: false,
+      description: 'Search By Email',
       url: `https://api.myapp.io/api/contacts?email=${triggerStep.output.contact.email}`,
       method: 'GET',
       params: {},
       headers: {},
-      description: 'Search By Email',
-      autoRetry: false,
-      continueWorkflowOnError: false,
     });
 
-    const contactExistsCondition = new ConditionalStep({
-      if: Operators.ArrayIsNotEmpty(
-        searchByEmailStep.output.response.body.data,
-      ),
+    const ifelseStep = new ConditionalStep({
+      if: Operators.ArrayIsNotEmpty(requestStep.output.response.body.data),
       description: 'Check If Exists',
     });
 
-    const createContactStep = new RequestStep({
-      description: 'Create Contact',
-      url: `https://api.myapp.io/api/contacts`,
-      method: 'POST',
-      params: {},
-      headers: {},
-      authorization: {
-        type: 'bearer',
-        token: `${context.getEnvironmentSecret('API_SECRET')}`,
-      },
-      body: { user_id: connectUser.userId, contact: triggerStep.output.result },
-      bodyType: 'json',
+    const updateContactStep = new RequestStep({
       autoRetry: false,
       continueWorkflowOnError: false,
-    });
-
-    const updateContactStep = new RequestStep({
       description: 'Update Contact',
       url: `https://api.myapp.io/api/contacts`,
       method: 'PATCH',
@@ -79,20 +70,53 @@ export default class extends Workflow<
       body: {
         user_id: connectUser.userId,
         contact: `${triggerStep.output.result}`,
-        contact_id: `${searchByEmailStep.output.response.body[0].id}`,
+        contact_id: `${requestStep.output.response.body['0'].id}`,
       },
       bodyType: 'json',
+    });
+
+    const createContactStep = new RequestStep({
       autoRetry: false,
       continueWorkflowOnError: false,
+      description: 'Create Contact',
+      url: `https://api.myapp.io/api/contacts`,
+      method: 'POST',
+      params: {},
+      headers: {},
+      authorization: {
+        type: 'bearer',
+        token: `${context.getEnvironmentSecret('API_SECRET')}`,
+      },
+      body: { user_id: connectUser.userId, contact: triggerStep.output.result },
+      bodyType: 'json',
+    });
+
+    const integrationRequestStep = new IntegrationRequestStep({
+      autoRetry: true,
+      continueWorkflowOnError: false,
+      description: 'Search Deals in Stages',
+      method: 'POST',
+      url: (pageToken: string) =>
+        `/crm/v3/objects/deals/search?q=testquery is ${pageToken}`,
+      params: { q: (pageToken: string) => `testquery is ${pageToken}` },
+      headers: { 'Content-Type': 'application/json' },
+      body: { limit: '2', after: (pageToken: string) => `${pageToken}` },
+      bodyType: 'json',
+      pagination: (currentStep) => ({
+        pageToken: `${currentStep.output.response.body.paging.next.after}`,
+        outputPath: `${currentStep.output.response.body.results}`,
+        stopCondition: Operators.DoesNotExist(
+          `${currentStep.output.response.body.paging.next.after}`,
+        ),
+      }),
     });
 
     triggerStep
-      .nextStep(searchByEmailStep)
+      .nextStep(requestStep)
       .nextStep(
-        contactExistsCondition
-          .whenTrue(updateContactStep)
-          .whenFalse(createContactStep),
-      );
+        ifelseStep.whenTrue(updateContactStep).whenFalse(createContactStep),
+      )
+      .nextStep(integrationRequestStep);
 
     /**
      * Pass all steps used in the workflow to the `.register()`
@@ -100,10 +124,11 @@ export default class extends Workflow<
      */
     return this.register({
       triggerStep,
-      searchByEmailStep,
-      contactExistsCondition,
-      createContactStep,
+      requestStep,
+      ifelseStep,
       updateContactStep,
+      createContactStep,
+      integrationRequestStep,
     });
   }
 
