@@ -1,4 +1,3 @@
-<hr/>
 <p align="center">
  <a href="https://www.useparagon.com/" target="blank">
   <picture>
@@ -12,9 +11,9 @@
   <b>
     The embedded integration platform for developers.
   </b>
-  <br/><br/>
-  Paragon is an embedded integration platform that 100+ software companies rely on to rapidly accelerate development of native product integrations with 3rd party SaaS apps such as Salesforce, Slack, and QuickBooks. This allows their engineering teams to avoid the heavy costs and risks that come with building and maintaining dozens of their own integrations.
 </p>
+
+Paragon is an embedded integration platform that 100+ software companies rely on to rapidly accelerate development of native product integrations with 3rd party SaaS apps such as Salesforce, Slack, and QuickBooks. This allows their engineering teams to avoid the heavy costs and risks that come with building and maintaining dozens of their own integrations.
 
 ---
 
